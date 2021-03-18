@@ -37,35 +37,34 @@ var (
 `
 )
 
-
 type ViewerPodOptions struct {
 	configFlags *genericclioptions.ConfigFlags
-	ioStreams genericclioptions.IOStreams
+	ioStreams   genericclioptions.IOStreams
 
-	kubeClient kubernetes.Interface
-	userSpecifiedPodName string
+	kubeClient             kubernetes.Interface
+	userSpecifiedPodName   string
 	userSpecifiedNamespace string
-	userSpecifiedTail bool
+	userSpecifiedTail      bool
 
 	container string
 	tailLines int64
-	args []string
+	args      []string
 }
 
 func NewPodViewerOption(streams genericclioptions.IOStreams) *ViewerPodOptions {
 	return &ViewerPodOptions{
 		configFlags: genericclioptions.NewConfigFlags(true),
-		ioStreams: streams,
+		ioStreams:   streams,
 	}
 }
 
 //NewCmdPodViewer runs the pod-view root command
-func NewCmdPodViewer(streams genericclioptions.IOStreams) *cobra.Command{
+func NewCmdPodViewer(streams genericclioptions.IOStreams) *cobra.Command {
 	v := NewPodViewerOption(streams)
 	cmd := &cobra.Command{
-		Use: "pod-viewer [pod-name] [flags]",
-		Short: "A Full view of kubernetes pod",
-		Example: fmt.Sprintf(viewerExample, "kubectl"),
+		Use:          "pod-viewer [pod-name] [flags]",
+		Short:        "A Full view of kubernetes pod",
+		Example:      fmt.Sprintf(viewerExample, "kubectl"),
 		SilenceUsage: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := v.Complete(cmd, args); err != nil {
@@ -89,11 +88,10 @@ func NewCmdPodViewer(streams genericclioptions.IOStreams) *cobra.Command{
 	return cmd
 }
 
-
 func (v *ViewerPodOptions) Complete(cmd *cobra.Command, args []string) error {
 	v.args = args
 	if len(args) > 0 {
-		if len(v.userSpecifiedPodName) > 0{
+		if len(v.userSpecifiedPodName) > 0 {
 			return fmt.Errorf("cannot specify multiple pods, only one pod name is allowed")
 		}
 
@@ -126,7 +124,7 @@ func (v *ViewerPodOptions) Complete(cmd *cobra.Command, args []string) error {
 }
 
 //LogOptions defines log options for a given pod
-func (v *ViewerPodOptions)LogOptions(cmd *cobra.Command) *corev1.PodLogOptions {
+func (v *ViewerPodOptions) LogOptions(cmd *cobra.Command) *corev1.PodLogOptions {
 	v.userSpecifiedTail = cmd.Flag("tail").Changed
 
 	logOptions := &corev1.PodLogOptions{}
@@ -141,7 +139,7 @@ func (v *ViewerPodOptions)LogOptions(cmd *cobra.Command) *corev1.PodLogOptions {
 }
 
 //Validate the root cmd arguments
-func (v *ViewerPodOptions) Validate() error{
+func (v *ViewerPodOptions) Validate() error {
 	if len(v.args) == 0 {
 		return fmt.Errorf("at least one argument is required")
 	}
@@ -153,19 +151,19 @@ func (v *ViewerPodOptions) Validate() error{
 }
 
 // Overview creates a full overview of kubernetes pods
-func (v ViewerPodOptions)Overview(podName, namespace string, client kubernetes.Interface, cmd *cobra.Command) (string, error) {
+func (v ViewerPodOptions) Overview(podName, namespace string, client kubernetes.Interface, cmd *cobra.Command) (string, error) {
 	buf := &bytes.Buffer{}
 
 	obj, err := pods.Get(client, podName, namespace)
 	if err != nil {
-		return "",err
+		return "", err
 	}
 
-	events, err := pods.SearchEvents(client, namespace ,obj)
+	events, err := pods.SearchEvents(client, namespace, obj)
 	if err != nil {
 		return "", err
 	}
-	log := pods.Logs(client, namespace, podName,v.LogOptions(cmd))
+	log := pods.Logs(client, namespace, podName, v.LogOptions(cmd))
 
 	s, err := util.StreamLogs(log)
 	if err != nil {
@@ -188,7 +186,6 @@ func (v ViewerPodOptions)Overview(podName, namespace string, client kubernetes.I
 
 }
 
-
 func (v ViewerPodOptions) Run(cmd *cobra.Command) error {
 	str, err := v.Overview(v.userSpecifiedPodName, v.userSpecifiedNamespace, v.kubeClient, cmd)
 	if err != nil {
@@ -197,5 +194,3 @@ func (v ViewerPodOptions) Run(cmd *cobra.Command) error {
 	fmt.Fprintf(v.ioStreams.Out, str)
 	return nil
 }
-
-

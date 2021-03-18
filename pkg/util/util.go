@@ -10,7 +10,7 @@ import (
 	"k8s.io/kubectl/pkg/describe"
 )
 
-func StreamLogs(request *rest.Request) (*bytes.Buffer, error){
+func StreamLogs(request *rest.Request) (*bytes.Buffer, error) {
 	return func() (*bytes.Buffer, error) {
 		bo := &bytes.Buffer{}
 		req, err := request.Stream(context.TODO())
@@ -27,7 +27,7 @@ func StreamLogs(request *rest.Request) (*bytes.Buffer, error){
 
 }
 
-func GetNamespace(flags *genericclioptions.ConfigFlags) string{
+func GetNamespace(flags *genericclioptions.ConfigFlags) string {
 	namespace, _, err := flags.ToRawKubeConfigLoader().Namespace()
 	if err != nil || len(namespace) == 0 {
 		namespace = "default"
