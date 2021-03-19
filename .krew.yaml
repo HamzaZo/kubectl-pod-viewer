@@ -1,0 +1,26 @@
+apiVersion: krew.googlecontainertools.github.com/v1alpha2
+kind: Plugin
+metadata:
+  name: pod-viewer
+spec:
+  version: {{ .TagName }}
+  homepage: https://github.com/HamzaZo/kubectl-pod-viewer
+  platforms:
+    - selector:
+        matchLabels:
+          os: darwin
+          arch: amd64
+      {{addURIAndSha "https://github.com/HamzaZo/kubectl-pod-viewer/releases/download/{{ .TagName }}/kubectl-pod-viewer_{{ .TagName }}_darwin_amd64.tar.gz" .TagName }}
+      bin: kubectl-pod-viewer
+    - selector:
+        matchLabels:
+          os: linux
+          arch: amd64
+      {{addURIAndSha "https://github.com/HamzaZo/kubectl-pod-viewer/releases/download/{{ .TagName }}/kubectl-pod-viewer_{{ .TagName }}_linux_amd64.tar.gz" .TagName }}
+      bin: kubectl-pod-viewer
+  shortDescription: A full view of kubernetes pods
+  description: |
+    Usage:
+      kubectl pod-viewer <pod-name> -n <namespace-name>
+      This plugin provides you with a full view of kubernetes pod. This is particularly useful for debugging
+      Read more documentation at: https://github.com/HamzaZo/kubectl-pod-viewe
