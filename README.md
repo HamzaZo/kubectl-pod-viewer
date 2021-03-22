@@ -41,7 +41,3 @@ Logs:
 /docker-entrypoint.sh: Configuration complete; ready for start up
 
 ```
-
-### Getting started
-
-To get started visit the [usage docs.](doc/usage.md)
